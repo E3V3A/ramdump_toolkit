@@ -7,6 +7,7 @@ set BUSYBOX_EXE=%CUR_PATH%\toolkit\win32\busybox.exe
 %BUSYBOX_EXE% rm -rf %CUR_PATH%\tz-log\
 
 %BUSYBOX_EXE% find %CUR_PATH% -type f ^
+! -name ".gitignore" ^
 ! -name "ramparser_msm8996.bat" ^
 ! -name "ramparser_msm8992.bat" ^
 ! -name "ramparser_msm8974.bat" ^
