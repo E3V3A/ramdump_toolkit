@@ -849,7 +849,7 @@ class RamDump():
                 'do {0}\n'.format(out_path + '/regs_panic.cmm').encode('ascii', 'ignore'))
         elif os.path.exists(out_path + '/core0_regs.cmm'):
             startup_script.write(
-                'do {0}\n'.format(out_path + 'core0_regs.cmm').encode('ascii', 'ignore'))
+                'do {0}\n'.format(out_path + '/core0_regs.cmm').encode('ascii', 'ignore'))
         startup_script.close()
 
         if t32_host_system != 'Linux':

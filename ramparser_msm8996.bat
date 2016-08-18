@@ -1,6 +1,8 @@
 @echo off
 
 set CUR_PATH=%~dp0
+cd %CUR_PATH%
+for /f "delims=" %%i in (' cd ') do (set CUR_PATH=%%i)
 
 set PYTHON_EXE=%CUR_PATH%\toolkit\python\python.exe
 set RAMPARSER_EXE=%CUR_PATH%\toolkit\ramparser_8996\ramparse.py
@@ -51,7 +53,7 @@ echo msm8996 ram parser Linux start
 	-x --64-bit ^
 	--ipc-skip ^
 	--force-hardware 8996 ^
-	--outdir %CUR_PATH%\ap-log
+	--outdir %CUR_PATH%\ap-log\
 
 %PYTHON_EXE% %TZPARSER_EXE% OCIMEM.BIN DDRCS0.BIN PIMEM.BIN > %CUR_PATH%\tz-log\tz_log.txt
 pause

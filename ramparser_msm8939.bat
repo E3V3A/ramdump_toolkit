@@ -1,6 +1,8 @@
 @echo off
 
 set CUR_PATH=%~dp0
+cd %CUR_PATH%
+for /f "delims=" %%i in (' cd ') do (set CUR_PATH=%%i)
 
 set PYTHON_EXE=%CUR_PATH%\toolkit\python\python.exe
 set RAMPARSER_EXE=%CUR_PATH%\toolkit\ramparser\ramparse.py
@@ -43,6 +45,6 @@ echo msm8939 ram parser Linux start
 	--vmlinux %CUR_PATH%\vmlinux ^
 	-a %CUR_PATH% ^
 	-x ^
-	--outdir %CUR_PATH%\ap-log
+	--outdir %CUR_PATH%\ap-log\
 
 pause
