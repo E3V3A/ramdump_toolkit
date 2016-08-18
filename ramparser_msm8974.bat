@@ -19,6 +19,7 @@ set FIND_CGI=http://172.16.2.18/cgi-bin/vmlinux-lookup.cgi
 %BUSYBOX_EXE% dd if=%CUR_PATH%\DDRCS0.BIN bs=20M count=1 2>nul | %BUSYBOX_EXE% strings | %BUSYBOX_EXE% grep "Linux version" | %BUSYBOX_EXE% head -n 1 | clip.exe
 for /f "delims=" %%i in (' %PASTE_EXE% ') do (set LINUX_VER=%%i)
 echo %LINUX_VER%
+echo %LINUX_VER% > %CUR_PATH%\linux_version.txt
 
 :: Kernel 
 %CURL_EXE% --data-urlencode "version=%LINUX_VER%" %FIND_CGI% 2>nul | %BUSYBOX_EXE% grep "kernel symbols" -A 1 | %BUSYBOX_EXE% tail -1 | ^
@@ -39,7 +40,6 @@ copy /y %SMB_PATH%\oem-code\rpm_proc\core\bsp\rpm\build\RPM_AAAAANAAR.elf %CUR_P
 
 
 ::Start parse
-echo msm8974 ram parser Linux start
 %BUSYBOX_EXE% rm -rf %CUR_PATH%\ap-log
 %BUSYBOX_EXE% mkdir %CUR_PATH%\ap-log
 %BUSYBOX_EXE% rm -rf %CUR_PATH%\tz-log
