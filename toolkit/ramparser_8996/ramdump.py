@@ -844,12 +844,12 @@ class RamDump():
         startup_script.write('task.dtask\n'.encode('ascii', 'ignore'))
         startup_script.write(
             'v.v  %ASCII %STRING linux_banner\n'.encode('ascii', 'ignore'))
-        if os.path.exists(out_path + '/regs_panic.cmm'):
+        if os.path.exists(out_path + 'regs_panic.cmm'):
             startup_script.write(
-                'do {0}\n'.format(out_path + '/regs_panic.cmm').encode('ascii', 'ignore'))
-        elif os.path.exists(out_path + '/core0_regs.cmm'):
+                'do {0}\n'.format(out_path + 'regs_panic.cmm').encode('ascii', 'ignore'))
+        elif os.path.exists(out_path + 'core0_regs.cmm'):
             startup_script.write(
-                'do {0}\n'.format(out_path + '/core0_regs.cmm').encode('ascii', 'ignore'))
+                'do {0}\n'.format(out_path + 'core0_regs.cmm').encode('ascii', 'ignore'))
         startup_script.close()
 
         if t32_host_system != 'Linux':
