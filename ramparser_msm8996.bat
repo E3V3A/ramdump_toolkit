@@ -4,14 +4,14 @@ set CUR_PATH=%~dp0
 cd %CUR_PATH%
 for /f "delims=" %%i in (' cd ') do (set CUR_PATH=%%i)
 
-set PYTHON_EXE=%CUR_PATH%\toolkit\python\python.exe
-set RAMPARSER_EXE=%CUR_PATH%\toolkit\ramparser_8996\ramparse.py
-set TZPARSER_EXE=%CUR_PATH%\toolkit\tz\tz_diag_parser_msm8996.py
-set NM_EXE=%CUR_PATH%\toolkit\toolchains\aarch64-linux-gnu-nm.exe
-set GDB_EXE=%CUR_PATH%\toolkit\toolchains\aarch64-linux-gnu-gdb.exe
-set BUSYBOX_EXE=%CUR_PATH%\toolkit\win32\busybox.exe
-set PASTE_EXE=%CUR_PATH%\toolkit\win32\paste.exe
-set CURL_EXE=%CUR_PATH%\toolkit\win32\curl.exe
+set PYTHON_EXE=%CUR_PATH%\package\windows\python\python.exe
+set RAMPARSER_EXE=%CUR_PATH%\package\python\ramparser_8996\ramparse.py
+set TZPARSER_EXE=%CUR_PATH%\package\python\tz\tz_diag_parser_msm8996.py
+set NM_EXE=%CUR_PATH%\package\windows\toolchain\aarch64-linux-gnu-nm.exe
+set GDB_EXE=%CUR_PATH%\package\windows\toolchain\aarch64-linux-gnu-gdb.exe
+set BUSYBOX_EXE=%CUR_PATH%\package\windows\utils\busybox.exe
+set PASTE_EXE=%CUR_PATH%\package\windows\utils\paste.exe
+set CURL_EXE=%CUR_PATH%\package\windows\utils\curl.exe
 
 set FIND_CGI=http://172.16.2.18/cgi-bin/vmlinux-lookup.cgi
 

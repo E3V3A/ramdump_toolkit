@@ -1,7 +1,7 @@
 @echo off
 
 set CUR_PATH=%~dp0
-set BUSYBOX_EXE=%CUR_PATH%\toolkit\win32\busybox.exe
+set BUSYBOX_EXE=%CUR_PATH%\package\windows\utils\busybox.exe
 
 %BUSYBOX_EXE% rm -rf %CUR_PATH%\ap-log\
 %BUSYBOX_EXE% rm -rf %CUR_PATH%\tz-log\
