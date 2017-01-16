@@ -6,8 +6,8 @@ for /f "delims=" %%i in (' cd ') do (set CUR_PATH=%%i)
 
 set PYTHON_EXE=%CUR_PATH%\package\windows\python\python.exe
 set RAMPARSER_EXE=%CUR_PATH%\package\python\ramparser\ramparse.py
-set NM_EXE=%CUR_PATH%\package\windows\toolchain\arm-linux-gnueabihf-nm.exe
-set GDB_EXE=%CUR_PATH%\package\windows\toolchain\arm-linux-gnueabihf-gdb.exe
+set NM_EXE=%CUR_PATH%\package\windows\toolchain\aarch64-linux-gnu-nm.exe
+set GDB_EXE=%CUR_PATH%\package\windows\toolchain\aarch64-linux-gnu-gdb.exe
 set BUSYBOX_EXE=%CUR_PATH%\package\windows\utils\busybox.exe
 set PASTE_EXE=%CUR_PATH%\package\windows\utils\paste.exe
 set CURL_EXE=%CUR_PATH%\package\windows\utils\curl.exe
@@ -15,7 +15,7 @@ set CURL_EXE=%CUR_PATH%\package\windows\utils\curl.exe
 set FIND_CGI=http://172.16.2.18/cgi-bin/vmlinux-lookup.cgi
 
 :: Linux version
-%BUSYBOX_EXE% dd if=%CUR_PATH%\DDRCS0.BIN bs=20M count=1 2>nul | %BUSYBOX_EXE% strings | %BUSYBOX_EXE% grep "Linux version" | %BUSYBOX_EXE% head -n 1 | clip.exe
+%BUSYBOX_EXE% dd if=%CUR_PATH%\DDRCS0_0.BIN bs=20M count=1 2>nul | %BUSYBOX_EXE% strings | %BUSYBOX_EXE% grep "Linux version" | %BUSYBOX_EXE% head -n 1 | clip.exe
 for /f "delims=" %%i in (' %PASTE_EXE% ') do (set LINUX_VER=%%i)
 echo %LINUX_VER%
 echo %LINUX_VER% > %CUR_PATH%\linux_version.txt
@@ -45,11 +45,10 @@ if not exist %CUR_PATH%\vmlinux (
 	-x --64-bit ^
 	--force-hardware 8992 ^
 	--outdir %CUR_PATH%\ap-log\ ^
-	--ram-file ./OCIMEM.BIN 0xFE800000 0xFE80FFFF ^
-	--ram-file ./DDRCS0_0.BIN 0x00000000 0x2FFFFFFF ^
-	--ram-file ./DDRCS0_1.BIN 0x80000000 0xAFFFFFFF ^
-	--ram-file ./DDRCS1_0.BIN 0x30000000 0x5FFFFFFF ^
-	--ram-file ./DDRCS1_1.BIN 0xB0000000 0xDFFFFFFF
+	--ram-file ./DDRCS0_0.BIN 0x00000000 0x1FFFFFFF ^
+	--ram-file ./DDRCS0_1.BIN 0x40000000 0x5FFFFFFF ^
+	--ram-file ./DDRCS1_0.BIN 0x20000000 0x3FFFFFFF ^
+	--ram-file ./DDRCS1_1.BIN 0x60000000 0x7FFFFFFF
 :: 3g	--ram-file ./DDRCS0_0.BIN 0x00000000 0x2FFFFFFF ^
 :: 3g	--ram-file ./DDRCS0_1.BIN 0x80000000 0xAFFFFFFF ^
 :: 3g	--ram-file ./DDRCS1_0.BIN 0x30000000 0x5FFFFFFF ^
