@@ -11,6 +11,7 @@ set BUSYBOX_EXE=%CUR_PATH%\package\windows\utils\busybox.exe
 ! -name "ramparser_msm8996.bat" ^
 ! -name "ramparser_msm8992.bat" ^
 ! -name "ramparser_msm8974.bat" ^
+! -name "ramparser_msm8953.bat" ^
 ! -name "ramparser_msm8939.bat" ^
 ! -name "ramparser_clean.bat" ^
 ! -name "rampdump.exe" ^

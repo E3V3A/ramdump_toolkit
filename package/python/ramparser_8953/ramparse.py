@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 
-# Copyright (c) 2012-2015, The Linux Foundation. All rights reserved.
+# Copyright (c) 2012-2016, The Linux Foundation. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 and
@@ -115,7 +115,7 @@ if __name__ == '__main__':
                       help='Offset for address space layout randomization')
     parser.add_option('', '--page-offset', type='int',
                       dest='page_offset', help='use custom page offset')
-    parser.add_option('', '--force-hardware', type='int',
+    parser.add_option('', '--force-hardware',
                       dest='force_hardware', help='Force the hardware detection')
     parser.add_option(
         '', '--force-version', type='int', dest='force_hardware_version',
@@ -134,6 +134,10 @@ if __name__ == '__main__':
                       help='Use QTF tool to parse and save QDSS trace data')
     parser.add_option('', '--qtf-path', dest='qtf_path',
                       help='QTF tool executable')
+    parser.add_option('', '--skip-qdss-bin', action='store_true',
+                      dest='skip_qdss_bin', help='Skip QDSS ETF and ETR '
+                      'binary data parsing from debug image (may save time '
+                      'if large ETM and ETR buffers are present)')
     parser.add_option('', '--ipc-help', dest='ipc_help',
                       help='Help for IPC Logging', action='store_true',
                       default=False)

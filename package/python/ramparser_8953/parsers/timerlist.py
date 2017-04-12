@@ -21,6 +21,13 @@ class TimerList(RamParser) :
         super(TimerList, self).__init__(*args)
         self.vectors = {'tv1': 256, 'tv2': 64, 'tv3': 64, 'tv4': 64, 'tv5': 64}
         self.output = []
+        self.timer_42 = False
+
+        # Timerlist structure changed in kernel 4.2
+        # Requires separate processing
+        if self.ramdump.kernel_version[0] >= 4:
+            if self.ramdump.kernel_version[1] >= 2:
+                self.timer_42 = True
 
     def timer_list_walker(self, node, type, index, base):
         if node == self.head:
@@ -30,7 +37,6 @@ class TimerList(RamParser) :
         function_addr = node + self.ramdump.field_offset('struct timer_list', 'function')
         expires_addr = node + self.ramdump.field_offset('struct timer_list', 'expires')
         data_addr = node + self.ramdump.field_offset('struct timer_list', 'data')
-        timer_base_addr = node + self.ramdump.field_offset('struct timer_list', 'base')
 
         function =  self.ramdump.unwind_lookup(self.ramdump.read_word(function_addr))[0]
         expires = self.ramdump.read_word(expires_addr)
@@ -40,7 +46,6 @@ class TimerList(RamParser) :
             self.output_file.write("+ Corruption detected at index {0} in {1} list, found corrupted value: {2:x}\n".format(index, type, data_addr))
             return
 
-        timer_base = self.ramdump.read_word(timer_base_addr) & ~3
 
         if function == "delayed_work_timer_fn":
             timer_list_offset = self.ramdump.field_offset('struct delayed_work', 'timer')
@@ -49,8 +54,12 @@ class TimerList(RamParser) :
             work_func = self.ramdump.unwind_lookup(self.ramdump.read_word(func_addr))[0]
             data += " / " + work_func
 
-        if timer_base != base:
-            remarks += "Timer Base Mismatch detected"
+        if not self.timer_42:
+            timer_base_addr = node + self.ramdump.field_offset(
+                'struct timer_list', 'base')
+            timer_base = self.ramdump.read_word(timer_base_addr) & ~3
+            if timer_base != base:
+                remarks += "Timer Base Mismatch detected"
 
         output = "\t{0:<6} {1:<18x} {2:<14} {3:<40} {4:<52} {5}\n".format(index, node, expires, function, data, remarks)
         self.output.append(output)
@@ -63,6 +72,19 @@ class TimerList(RamParser) :
             node_offset = self.ramdump.field_offset('struct list_head', 'next')
             timer_list_walker = linux_list.ListWalker(self.ramdump, index, node_offset)
             timer_list_walker.walk(index, self.timer_list_walker, type, i, base)
+
+    def iterate_vec_v2(self, type, base):
+        vec_addr = base + self.ramdump.field_offset('struct tvec_base', type)
+        for i in range(0, self.vectors[type]):
+            index = self.ramdump.array_index(vec_addr, 'struct hlist_head', i)
+            self.head = index
+            index = self.ramdump.read_word(index)
+            node_offset = self.ramdump.field_offset(
+                'struct hlist_node', 'next')
+            timer_list_walker = linux_list.ListWalker(self.ramdump, index,
+                                                      node_offset)
+            timer_list_walker.walk(index, self.timer_list_walker, type, i,
+                                   base)
 
     def print_vec(self, type):
         if len(self.output):
@@ -78,18 +100,23 @@ class TimerList(RamParser) :
         self.output_file.write("Timer List Dump\n\n")
 
         tvec_bases_addr = self.ramdump.address_of('tvec_bases')
+
         for cpu in range(0, self.ramdump.get_num_cpus()):
             title = "CPU {0}".format(cpu)
 
             base_addr = tvec_bases_addr + self.ramdump.per_cpu_offset(cpu)
-            base = self.ramdump.read_word(base_addr)
+            if self.timer_42:
+                base = base_addr
+            else:
+                base = self.ramdump.read_word(base_addr)
+
             title += "(tvec_base: {0:x} ".format(base)
 
             timer_jiffies_addr = base + self.ramdump.field_offset('struct tvec_base', 'timer_jiffies')
             next_timer_addr = base + self.ramdump.field_offset('struct tvec_base', 'next_timer')
+
             timer_jiffies = self.ramdump.read_word(timer_jiffies_addr)
             next_timer = self.ramdump.read_word(next_timer_addr)
-
             active_timers_offset = self.ramdump.field_offset('struct tvec_base', 'active_timers')
             if active_timers_offset is not None:
                 active_timers_addr = base + self.ramdump.field_offset('struct tvec_base', 'active_timers')
@@ -104,12 +131,14 @@ class TimerList(RamParser) :
 
             for vec in sorted(self.vectors):
                 self.output = []
-                self.iterate_vec(vec, base)
+                if self.timer_42:
+                    self.iterate_vec_v2(vec, base)
+                else:
+                    self.iterate_vec(vec, base)
                 self.print_vec(vec)
 
     def parse(self):
         self.output_file = self.ramdump.open_file('timerlist.txt')
-
         self.get_timer_list()
 
         self.output_file.close()

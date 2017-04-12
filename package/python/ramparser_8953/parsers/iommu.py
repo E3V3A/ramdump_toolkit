@@ -1,4 +1,4 @@
-# Copyright (c) 2013-2014, The Linux Foundation. All rights reserved.
+# Copyright (c) 2013-2016, The Linux Foundation. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 and
@@ -14,8 +14,10 @@ import math
 from print_out import print_out_str
 from parser_util import register_parser, RamParser
 from sizes import SZ_4K, SZ_64K, SZ_1M, SZ_16M, get_order, order_size_strings
-from iommulib import IommuLib
+from iommulib import IommuLib, MSM_SMMU_DOMAIN
 from lpaeiommulib import parse_long_form_tables
+from aarch64iommulib import parse_aarch64_tables
+
 
 @register_parser('--print-iommu-pg-tables', 'Print IOMMU page tables')
 class IOMMU(RamParser):
@@ -303,9 +305,9 @@ class IOMMU(RamParser):
                 self.out_file.write('0x%08x--0x%08x [0x%08x] [UNMAPPED]\n' %
                                     (mapping.virt_start, mapping.virt_end, mapping.virt_size()))
 
-    def parse_short_form_tables(self, d):
+    def parse_short_form_tables(self, d, domain_num):
         self.out_file = self.ramdump.open_file(
-            'msm_iommu_domain_%02d.txt' % (d.domain_num))
+            'msm_iommu_domain_%02d.txt' % (domain_num))
         redirect = 'OFF'
         if d.redirect is None:
             redirect = 'UNKNOWN'
@@ -318,8 +320,9 @@ class IOMMU(RamParser):
                 iommu_context += '%s (%d) ' % (name, num)
         iommu_context = iommu_context.strip()
 
-        self.out_file.write('IOMMU Context: %s. Domain: %s (%d) [L2 cache redirect for page tables is %s]\n' % (
-            iommu_context, d.client_name, d.domain_num, redirect))
+        self.out_file.write('IOMMU Context: %s. Domain: %s'
+                            '[L2 cache redirect for page tables is %s]\n' % (
+                                  iommu_context, d.client_name, redirect))
         self.out_file.write(
             '[VA Start -- VA End  ] [Size      ] [PA Start   -- PA End  ] [Size      ] [Read/Write][Page Table Entry Size]\n')
         if d.pg_table == 0:
@@ -339,8 +342,14 @@ class IOMMU(RamParser):
                 '[!] WARNING: IOMMU domains was not found in this build. No IOMMU page tables will be generated')
             return
 
-        for d in self.domain_list:
+        for (domain_num, d) in enumerate(self.domain_list):
             if self.ramdump.is_config_defined('CONFIG_IOMMU_LPAE'):
-                parse_long_form_tables(self.ramdump, d)
+                parse_long_form_tables(self.ramdump, d, domain_num)
+            elif (self.ramdump.is_config_defined('CONFIG_IOMMU_AARCH64') or
+                    self.ramdump.is_config_defined('CONFIG_ARM_SMMU')):
+                if (d.domain_type == MSM_SMMU_DOMAIN):
+                    self.parse_short_form_tables(d, domain_num)
+                else:
+                    parse_aarch64_tables(self.ramdump, d, domain_num)
             else:
-                self.parse_short_form_tables(d)
+                self.parse_short_form_tables(d, domain_num)

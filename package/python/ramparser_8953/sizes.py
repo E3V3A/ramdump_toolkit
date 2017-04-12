@@ -67,6 +67,7 @@ SZ_512M = 0x20000000
 
 SZ_1G = 0x40000000
 SZ_2G = 0x80000000
+SZ_256G = 0x8000000000
 
 size_strings = OrderedDict((
     (SZ_1, "1"),
@@ -101,6 +102,7 @@ size_strings = OrderedDict((
     (SZ_512M, "512M"),
     (SZ_1G, "1G"),
     (SZ_2G, "2G"),
+    (SZ_256G, "256G"),
 ))
 
 def is_power_of_two(n):
